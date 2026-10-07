@@ -1,5 +1,6 @@
 #pragma once 
 #include <iostream>
+#include <string>
 
 // 1. 본인이름학번의 네임스페이스
 // -본인이름학번 네임스페이스 예: 이름이 김프로이고 학번이 1234567일 경우 KimPro1234567
@@ -21,6 +22,7 @@ namespace ywchoi2649052
 // -get 접근함수들: 멤버변수 값 리턴
 class student
 {
+    std::string name{}; //private - std::string형 멤버변수
     int id{};
     int score{};
     char grade{};
@@ -48,13 +50,17 @@ class student
 
 public:
     //-생성자constructor: 모든 멤버변수 초기화, 기본값 설정, test 함수들 호출
-    student(int d = 1234567, int s = 0, char g = 'F')
-        :id{d}, score{s}, grade{g} //멤버초기화리스트
+    //-생성자 변경: std::string형 멤버변수를 초기화
+    student(const std::string& n = "no name yet", int d = 1234567, int s = 0, char g = 'F')
+        :name{n}, id{d}, score{s}, grade{g} //멤버초기화리스트-> 모든 매개변수 초기화!!
     {
         testId(); testScore(); testGrade();
     }
 
     void input(){
+        std::cout << "Enter name: ";
+        //std::cin >> (std::ws >>) name;
+        std::getline(std::cin >> std::ws, name);
         std::cout << "Enter your id: ";
         std::cin >> id; testId();
         std::cout << "Enter your score: ";
@@ -66,6 +72,8 @@ public:
     //-프렌드 함수로서 입력연산자 >> 
     friend std::istream& operator>>(std::istream& is, student& s)
     {//input: std::cin --> is로 다 바꾸기
+        std::cout << "Enter name: ";
+        std::getline(is >> std::ws, s.name);
         std::cout << "Enter id: ";
         is >> s.id; s.testId();
         std::cout << "Enter your score: ";
@@ -75,7 +83,7 @@ public:
         return is;    
     }
 
-
+    void setName(const std::string& n){name = n;}
     void setId(int d){id = d; testId();}
     void setScore(int s){score = s; testScore();}
     void setGrade(char g){grade = g; testGrade();}
@@ -83,19 +91,19 @@ public:
     //const 멤버함수로 변경
     void print() const 
     {
-        std::cout << id << ", " << score << ", " << grade << std::endl;
+        std::cout << name << "(" << id << "): " << score << "(" << grade << ")\n";
     
     }
 
     // -프렌드 함수로서 출력연산자 <<
     friend std::ostream& operator<<(std::ostream& os, const student& s)
     {//print(): std::cout --> os
-        os << s.id << ", " << s.score << ", " << s.grade << '\n'; //friend는 멤버함수가 아니니까!
+        os << s.name << "(" << s.id <<  "): " << s.score << "(" << s.grade << ")\n"; //friend는 멤버함수가 아니니까!
         return os;
     }
     
     
-    
+    const std::string& getName() const {return name;} //const 멤버함수이기 때문
     int getId() const {return id;}
     int getScore() const {return score;}
     char getGrade() const {return grade;}
@@ -104,13 +112,13 @@ public:
     student operator++()
     {//intPair: x,y //intPair a++; ++a; //++x,++y
         //student: id, score, grade ??students; ++s; //++score
-        return student{id, ++score, grade};
+        return student{name, id, ++score, grade};
     }
 // -멤버함수로 후위증가연산자 정의
     student operator++(int)
     {
         //return student student{id, score++, grade};
-        student temp{id, score, grade};
+        student temp{name, id, score, grade};
         score++;
         return temp;
     }
